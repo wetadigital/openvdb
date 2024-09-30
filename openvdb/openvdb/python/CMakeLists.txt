@@ -20,7 +20,7 @@ Expose (almost) all of the grid types in the python module. Otherwise, only Floa
 Vec3SGrid will be exposed (see, e.g., exportIntGrid() in python/pyIntGrid.cc). Compiling the Python
 module with this ON can be very memory-intensive.]=] OFF)
 option(OPENVDB_BUILD_PYTHON_UNITTESTS [=[
-"Include the OpenVDB Python unit test. Requires a python interpreter]=]
+Include the OpenVDB Python unit test. Requires a python interpreter]=]
 ${OPENVDB_BUILD_UNITTESTS})
 
 #########################################################################
@@ -163,6 +163,11 @@ if(USE_AX)
   target_link_libraries(pyopenvdb PUBLIC ${OPENVDB_AX_LIB})
   target_compile_definitions(pyopenvdb PUBLIC "-DPY_OPENVDB_USE_AX")
 endif()
+
+# Weta FX Customization: Suppress some annoying warnings:
+target_compile_options(pyopenvdb PRIVATE
+  -Wno-abi
+)
 
 install(TARGETS
   pyopenvdb

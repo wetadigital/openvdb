@@ -1,0 +1,178 @@
+habitat: 1.0
+
+Settings:
+  Name: openvdb
+  InstallForVFXPlatform: true
+  InstallIncludesDebug: true
+  Variants: [ VP23DBG, VP23 ]
+  DefaultVariant: VP23
+
+openvdb:
+  Type: Weta::OZ::SimplePak
+  PakNameOverride: openvdb
+  Raw:
+    # SPDX https://spdx.org/licenses/ identifier or WētāDigital
+    license: MPL-2.0
+    third_party: true
+  PakVariables:
+    PATH: !Prepend '${INSTALL_PREFIX}/opt/bin'
+    LD_LIBRARY_PATH: !Prepend '${INSTALL_PREFIX}/opt/lib'
+    PYTHONPATH: !PrependFor ['python', '${INSTALL_PREFIX}/opt/lib/python%(PYTHONVERSION)s/site-packages']
+  DeveloperVariables:
+    CMAKE_PREFIX_PATH: !Prepend '${INSTALL_PREFIX}/opt'
+  Library: openvdb
+  Requires:
+    python: !Soft ">=3.10.13<3.11"
+  DeveloperRequires:
+    # This will include anything defined in `Requires` as well.
+    openexr: ">=3.1.13-weta.1<3.2"
+    imath: ">=3.1.12-weta.1<3.2"
+    boost: ">=1.80.0-weta.1<1.80.1"
+    tbb: ">=2020.3.0-weta.5<2020.4.0"
+    libblosc: ">=1.21.0<2"
+    zlib: ">=1.2.13<1.3"
+    zstd: ">=1.5.0<2"
+    bzip2: ">=1.0.8-weta.1<2"
+    xz: ">=5.2.5<6"
+    pybind11: ">=2.13.5<3"
+    abi: "gcc-171"
+    # However, for DeveloperRequires do hard requirement for python:
+    python: ">=3.10.13<3.11"
+
+libopenvdb:
+  Type: Weta::OZ::SimplePak
+  PakNameOverride: libopenvdb
+  Raw:
+    # SPDX https://spdx.org/licenses/ identifier or WētāDigital
+    license: MPL-2.0
+    third_party: true
+    deprecated: true
+  Requires:
+    openvdb: "${VERSION}"
+
+build.openvdb:
+  Type: Weta::OSS::CmakePackage
+  BaseEnvironment:
+    - cmake-3.27.7
+    - ninja-1.10.2
+    - patchelf-0.18.0
+    - python-3.10.13
+  BuildEnvironment:
+    - WetaVFXPlatform-2023.0.3
+    - openexr-3.1.13-weta.1
+    - imath-3.1.12-weta.1
+    - boost-1.80.0-weta.1
+    - tbb-2020.3.0-weta.5
+    - libblosc-1.21.0
+    - zlib-1.2.13
+    - zstd-1.5.0
+    - bzip2-1.0.8-weta.1
+    - xz-5.2.5
+    - pybind11-2.13.5
+    - abi-gcc-171
+  ExtraConfigureArgs: !Sub |
+    -DCMAKE_CXX_STANDARD=${Variant:C++Version}
+    -DOPENVDB_BUILD_CORE=ON
+    -DOPENVDB_BUILD_BINARIES=ON
+    -DOPENVDB_BUILD_PYTHON_MODULE=ON
+    -DOPENVDB_BUILD_UNITTESTS=OFF
+    -DOPENVDB_BUILD_DOCS=OFF
+    -DOPENVDB_BUILD_HOUDINI_PLUGIN=OFF
+    -DOPENVDB_BUILD_HOUDINI_ABITESTS=OFF
+    -DOPENVDB_BUILD_AX=OFF
+    -DOPENVDB_BUILD_AX_UNITTESTS=OFF
+    -DOPENVDB_BUILD_NANOVDB=OFF
+    -DOPENVDB_BUILD_MAYA_PLUGIN=OFF
+    -DOPENVDB_USE_DELAYED_LOADING=ON
+    -DOPENVDB_ENABLE_RPATH=OFF
+    -DOPENVDB_CXX_STRICT=OFF
+    -DOPENVDB_INSTALL_CMAKE_MODULES=ON
+    -DUSE_HOUDINI=OFF
+    -DUSE_MAYA=OFF
+    -DUSE_TBB=ON
+    -DUSE_BLOSC=ON
+    -DUSE_ZLIB=ON
+    -DUSE_LOG4CPLUS=OFF
+    -DUSE_EXR=OFF
+    -DUSE_IMATH_HALF=ON
+    -DUSE_PNG=OFF
+    -DUSE_AX=OFF
+    -DUSE_NANOVDB=OFF
+    -DUSE_STATIC_DEPENDENCIES=OFF
+    -DDISABLE_DEPENDENCY_VERSION_CHECKS=OFF
+    -DDISABLE_CMAKE_SEARCH_PATHS=OFF
+    -DOPENVDB_FUTURE_DEPRECATION=ON
+    -DOPENVDB_ENABLE_UNINSTALL=ON
+    -DUSE_COLORED_OUTPUT=OFF
+    -DUSE_PKGCONFIG=OFF
+    -DUSE_EXPLICIT_INSTANTIATION=ON
+    -DOPENVDB_USE_DEPRECATED_ABI_8=ON
+    -DOPENVDB_USE_DEPRECATED_ABI_9=ON
+    -DOPENVDB_CORE_SHARED=ON
+    -DOPENVDB_CORE_STATIC=ON
+    -DUSE_NUMPY=OFF
+    -DOPENVDB_PYTHON_WRAP_ALL_GRID_TYPES=OFF
+    -DOPENVDB_BUILD_PYTHON_UNITTESTS=OFF
+    -DOPENVDB_BUILD_VDB_PRINT=ON
+    -DOPENVDB_BUILD_VDB_LOD=ON
+    -DOPENVDB_BUILD_VDB_RENDER=ON
+    -DOPENVDB_BUILD_VDB_VIEW=OFF
+    -DOPENVDB_BUILD_VDB_TOOL=ON
+    -DOPENVDB_BUILD_VDB_AX=OFF
+    -DOPENVDB_BUILD_AX_BINARIES=OFF
+    -DBUILD_TEST=OFF
+    -DOPENVDB_TOOL_USE_NANO=OFF
+    -DOPENVDB_TOOL_NANO_USE_ZIP=ON
+    -DOPENVDB_TOOL_NANO_USE_BLOSC=ON
+    -DOPENVDB_TOOL_USE_PNG=OFF
+    -DOPENVDB_TOOL_USE_EXR=OFF
+    -DOPENVDB_TOOL_USE_JPG=OFF
+    -DOPENVDB_TOOL_USE_ABC=OFF
+    -DOPENVDB_TOOL_USE_ALL=OFF
+    -DCONCURRENT_MALLOC=None
+    -DOPENVDB_SIMD=AVX
+    -DBoost_IOSTREAMS_LIBRARY_RELEASE=${{LIBBOOST_LIBPATH}}/libboost_iostreams.a
+    -DBLOSC_USE_STATIC_LIBS=ON
+    -DOPENEXR_USE_STATIC_LIBS=ON
+    -DILMBASE_USE_STATIC_LIBS=ON
+    -DTBB_USE_STATIC_LIBS=OFF
+    -DLOG4CPLUS_USE_STATIC_LIBS=ON
+    -DJEMALLOC_USE_STATIC_LIBS=ON
+    -DGTEST_USE_STATIC_LIBS=ON
+    -DBoost_USE_STATIC_LIBS=ON
+    -DCMAKE_CXX_FLAGS="-I${{LIBZSTD_INCLUDES}}"
+    -DCMAKE_SHARED_LINKER_FLAGS="-Wl,-Bsymbolic -Wl,--exclude-libs,ALL -Wl,--enable-new-dtags -L${{LIBZSTD_LIBPATH}}"
+    -DCMAKE_MODULE_LINKER_FLAGS="-Wl,-Bsymbolic -Wl,--exclude-libs,ALL -Wl,--enable-new-dtags -L${{LIBZSTD_LIBPATH}}"
+    -DCMAKE_EXE_LINKER_FLAGS="-Wl,-Bsymbolic -Wl,--exclude-libs,ALL -L${{LIBZSTD_LIBPATH}}"
+    -DCMAKE_${{BUILD_TYPE}}_POSTFIX=
+  PreProcess: |
+    if [[ -L "${INSTALL_PREFIX}${VARIANT_PREFIX}/include" ]]; then
+        rm "${INSTALL_PREFIX}${VARIANT_PREFIX}/include"
+    fi
+  PostProcess: |
+    if [[ ! -L "${INSTALL_PREFIX}${VARIANT_PREFIX}/include" ]]; then
+      if [[ -d "${INSTALL_PREFIX}${VARIANT_PREFIX}/include" ]]; then
+        # Saw an actual directory, so the headers there are the ones
+        # generated by cmake without the custom snippet. Save a copy.
+        mkdir -p ${BUILD_DIR}/weta_orig_include
+        cp -fr -t ${BUILD_DIR}/weta_orig_include ${INSTALL_PREFIX}${VARIANT_PREFIX}/include/.
+      fi
+    fi
+    # Regenerate the common header directory (with the custom snippet) using
+    # the saved common copies of the headers generated by cmake.
+    mkdir -p ${INSTALL_PREFIX}/include
+    find ${BUILD_DIR}/weta_orig_include -mindepth 1 -type d -printf '%P\0' | xargs -0r -I__SUBPATH__ mkdir -p ${INSTALL_PREFIX}/include/__SUBPATH__
+    find ${BUILD_DIR}/weta_orig_include -mindepth 1 -type f -printf '%P\0' | xargs -0r -I__SUBPATH__ sed -n w${INSTALL_PREFIX}/include/__SUBPATH__ weta_patches/weta_quiet_header_warnings_snippet.h ${BUILD_DIR}/weta_orig_include/__SUBPATH__
+    # Clear out what was present for the per-variant headers and make sure
+    # it is a symlink to the common header directory:
+    rm -rf ${INSTALL_PREFIX}${VARIANT_PREFIX}/include
+    ln -s ${INSTALL_PREFIX}/include ${INSTALL_PREFIX}${VARIANT_PREFIX}/include
+    find ${INSTALL_PREFIX}${VARIANT_PREFIX}/bin -mindepth 1 -maxdepth 1 -name 'vdb_*' -type f -print0 | xargs -0rtn1 patchelf --set-rpath '$ORIGIN/../lib'
+    find ${INSTALL_PREFIX}${VARIANT_PREFIX}/lib -mindepth 1 -maxdepth 1 -name 'libopenvdb.so.*.*.*' -type f -print0 | xargs -0rtn1 patchelf --remove-rpath
+    find ${INSTALL_PREFIX}${VARIANT_PREFIX}/lib/python${PYTHONVERSION}/site-packages -mindepth 1 -maxdepth 1 -name 'pyopenvdb*.so' -type f -print0 | xargs -0rtn1 patchelf --set-rpath '$ORIGIN/../..'
+    if [[ -e ${INSTALL_PREFIX}${VARIANT_PREFIX}/lib/libopenvdb.a ]]; then
+      ln -fTs libopenvdb.a ${INSTALL_PREFIX}${VARIANT_PREFIX}/lib/libopenvdb${WETA_VFXPLATFORM_ID}.a
+    fi
+    if [[ -e ${INSTALL_PREFIX}${VARIANT_PREFIX}/lib/libopenvdb.so ]]; then
+      ln -fTs libopenvdb.so ${INSTALL_PREFIX}${VARIANT_PREFIX}/lib/libopenvdb${WETA_VFXPLATFORM_ID}.so
+    fi

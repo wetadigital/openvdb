@@ -11,6 +11,7 @@
 #include <cstdint>
 
 #ifdef OPENVDB_USE_DELAYED_LOADING
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <boost/iostreams/copy.hpp>
 #ifndef _WIN32
 #include <sys/types.h>
