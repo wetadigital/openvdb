@@ -81,6 +81,12 @@
 #include <unistd.h>
 #endif
 
+// Due to a bug in older versions of gcc, including fstream might
+// define "major" and "minor" which are used as member data below.
+// See https://bugzilla.redhat.com/show_bug.cgi?id=130601
+#undef major
+#undef minor
+
 namespace openvdb {
 OPENVDB_USE_VERSION_NAMESPACE
 namespace OPENVDB_VERSION_NAME {

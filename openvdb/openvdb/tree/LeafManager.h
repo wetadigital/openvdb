@@ -671,7 +671,7 @@ private:
     {
         const size_t auxBufferCount = mLeafCount * mAuxBuffersPerLeaf;
         if (auxBufferCount != mAuxBufferCount) {
-            if (auxBufferCount > 0) {
+            if (ssize_t(auxBufferCount) > 0) {
                 mAuxBufferPtrs.reset(new NonConstBufferType[auxBufferCount]);
                 mAuxBuffers = mAuxBufferPtrs.get();
             } else {

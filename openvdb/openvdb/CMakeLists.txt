@@ -685,6 +685,11 @@ if(OPENVDB_CORE_STATIC)
     endif()
     set_target_properties(openvdb_static PROPERTIES PREFIX "lib")
   endif()
+
+  # Weta FX Customization: Suppress some annoying warnings:
+  target_compile_options(openvdb_static PRIVATE
+    -Wno-abi
+    )
 endif()
 
 # Configure shared build
@@ -720,6 +725,11 @@ if(OPENVDB_CORE_SHARED)
         "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/MD$<$<CONFIG:Debug>:d>>")
     endif()
   endif()
+
+  # Weta FX Customization: Suppress some annoying warnings:
+  target_compile_options(openvdb_shared PRIVATE
+    -Wno-abi
+    )
 endif()
 
 ##########################################################################

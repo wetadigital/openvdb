@@ -168,6 +168,11 @@ target_include_directories(vdb_tool PRIVATE vdb_tool_common)
 target_link_libraries(vdb_tool PRIVATE vdb_tool_common)
 install(TARGETS vdb_tool RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
+# Weta FX Customization: Suppress some annoying warnings:
+target_compile_options(vdb_tool PRIVATE
+  -Wno-abi
+  -Wno-undef
+  )
 
 # unit test
 if(BUILD_TEST)
